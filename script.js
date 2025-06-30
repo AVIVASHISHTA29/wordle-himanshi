@@ -67,12 +67,7 @@ function handleKey(key) {
     if (gameOver || currentRow >= MAX_GUESSES) return;
 
     if (key === '←') {
-        if (currentCol > 0) {
-            currentCol--;
-            const tile = grid[currentRow][currentCol];
-            tile.textContent = '';
-            tile.classList.remove('filled');
-        }
+        handleBackspace();
         return;
     }
 
@@ -88,6 +83,30 @@ function handleKey(key) {
         tile.textContent = key;
         tile.classList.add('filled');
         currentCol++;
+    }
+}
+
+function handleBackspace() {
+    if (currentCol > 0) {
+        currentCol--;
+        const tile = grid[currentRow][currentCol];
+
+        // Add pop-out animation only if tile isn't already animating
+        if (!tile.style.animation) {
+            tile.style.animation = 'tile-pop-out 0.15s ease-in-out';
+        }
+
+        // Immediately clear content for responsive feel
+        tile.textContent = '';
+        tile.classList.remove('filled');
+
+        // Reset any previous states that might be lingering
+        tile.classList.remove('correct', 'present', 'absent');
+
+        // Clear animation after it completes
+        setTimeout(() => {
+            tile.style.animation = '';
+        }, 150);
     }
 }
 

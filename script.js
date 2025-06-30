@@ -3,13 +3,14 @@ const WORD_LENGTH = 5;
 const MAX_GUESSES = 6;
 
 /* A tiny demo list; replace with a bigger dictionary or fetch daily word */
-const WORDS = ['apple', 'grape', 'crane', 'plant', 'brine', 'smile', 'chair'];
+const WORDS = ['apple', 'grape', 'crane', 'plant', 'brine', 'smile', 'chair', 'about', 'other', 'which', 'their', 'would', 'there', 'could', 'water'];
 
 const ANSWER = WORDS[Math.floor(Math.random() * WORDS.length)].toUpperCase();
 
 let currentRow = 0;
 let currentCol = 0;
 let grid = [];
+let gameOver = false;
 
 /* ---------- DOM refs ---------- */
 const board = document.getElementById('board');
@@ -21,28 +22,40 @@ for (let r = 0; r < MAX_GUESSES; r++) {
     for (let c = 0; c < WORD_LENGTH; c++) {
         const tile = document.createElement('div');
         tile.className = 'tile';
+        tile.setAttribute('data-row', r);
+        tile.setAttribute('data-col', c);
         board.appendChild(tile);
         grid[r][c] = tile;
     }
 }
 
 /* ---------- Build keyboard ---------- */
-const KEYS_ROW1 = 'QWERTYUIOP';
-const KEYS_ROW2 = 'ASDFGHJKL';
-const KEYS_ROW3 = ['Enter', ...'ZXCVBNM', '←'];
+const KEYBOARD_LAYOUT = [
+    ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+    ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+    ['Enter', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '←']
+];
 
-[KEYS_ROW1, KEYS_ROW2, KEYS_ROW3].forEach(row => {
-    [...row].forEach(k => {
+KEYBOARD_LAYOUT.forEach(row => {
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'keyboard-row';
+
+    row.forEach(key => {
         const btn = document.createElement('button');
-        btn.textContent = k;
-        btn.className = 'key' + (k === 'Enter' || k === '←' ? ' wide' : '');
-        btn.onclick = () => handleKey(k);
-        keyboard.appendChild(btn);
+        btn.textContent = key === '←' ? '⌫' : key;
+        btn.className = 'key' + (key === 'Enter' || key === '←' ? ' wide' : '');
+        btn.setAttribute('data-key', key);
+        btn.onclick = () => handleKey(key);
+        rowDiv.appendChild(btn);
     });
+
+    keyboard.appendChild(rowDiv);
 });
 
 /* ---------- Event listeners ---------- */
 window.addEventListener('keydown', e => {
+    if (gameOver) return;
+
     const k = e.key.toUpperCase();
     if (k === 'BACKSPACE') return handleKey('←');
     if (k === 'ENTER') return handleKey('Enter');
@@ -51,7 +64,7 @@ window.addEventListener('keydown', e => {
 
 /* ---------- Game logic ---------- */
 function handleKey(key) {
-    if (currentRow >= MAX_GUESSES) return; // game over
+    if (gameOver || currentRow >= MAX_GUESSES) return;
 
     if (key === '←') {
         if (currentCol > 0) {
@@ -80,17 +93,21 @@ function handleKey(key) {
 
 function submitGuess() {
     const guess = grid[currentRow].map(t => t.textContent).join('');
-    if (guess.length < WORD_LENGTH) return; // safety
+    if (guess.length < WORD_LENGTH) return;
+
+    // Disable input during animation
+    gameOver = true;
 
     /* Evaluate guess */
     const answerArr = ANSWER.split('');
     const guessArr = guess.split('');
+    const results = [];
 
     // First pass: greens
     guessArr.forEach((ch, i) => {
         if (ch === answerArr[i]) {
-            markTile(i, 'correct');
-            answerArr[i] = null; // consume
+            results[i] = 'correct';
+            answerArr[i] = null;
             guessArr[i] = null;
         }
     });
@@ -100,36 +117,76 @@ function submitGuess() {
         if (ch === null) return;
         const idx = answerArr.indexOf(ch);
         if (idx > -1) {
-            markTile(i, 'present');
+            results[i] = 'present';
             answerArr[idx] = null;
         } else {
-            markTile(i, 'absent');
+            results[i] = 'absent';
         }
     });
 
-    // Win / lose?
-    if (guess === ANSWER) {
-        setTimeout(() => alert('🎉 You win!'), 100);
-    } else if (++currentRow === MAX_GUESSES) {
-        setTimeout(() => alert(`The word was ${ANSWER}`), 100);
-    }
-    currentCol = 0;
+    // Animate tiles with staggered timing
+    results.forEach((result, i) => {
+        setTimeout(() => {
+            flipTile(currentRow, i, result);
+        }, i * 100);
+    });
+
+    // Check win/lose after all animations complete
+    setTimeout(() => {
+        if (guess === ANSWER) {
+            setTimeout(() => {
+                alert('🎉 Congratulations! You guessed the word!');
+            }, 500);
+        } else if (++currentRow === MAX_GUESSES) {
+            setTimeout(() => {
+                alert(`Game Over! The word was: ${ANSWER}`);
+            }, 500);
+        } else {
+            gameOver = false; // Re-enable input for next guess
+        }
+        currentCol = 0;
+    }, results.length * 100 + 300);
 }
 
-function markTile(col, state) {
-    const tile = grid[currentRow][col];
-    tile.className = `tile ${state}`;
+function flipTile(row, col, state) {
+    const tile = grid[row][col];
     const letter = tile.textContent;
-    const keyBtn = [...keyboard.children]
-        .find(b => b.textContent === letter);
-    if (keyBtn && !keyBtn.classList.contains('correct')) { // don't downgrade green
-        keyBtn.classList.add(state);
-    }
+
+    tile.classList.add('flip');
+
+    // Change the tile appearance at the midpoint of the flip
+    setTimeout(() => {
+        tile.classList.add(state);
+        updateKeyboard(letter, state);
+    }, 300);
+
+    // Remove flip class after animation
+    setTimeout(() => {
+        tile.classList.remove('flip');
+    }, 600);
+}
+
+function updateKeyboard(letter, state) {
+    const keyBtn = document.querySelector(`[data-key="${letter}"]`);
+    if (!keyBtn) return;
+
+    // Don't downgrade from correct to present/absent
+    if (keyBtn.classList.contains('correct')) return;
+
+    // Don't downgrade from present to absent
+    if (keyBtn.classList.contains('present') && state === 'absent') return;
+
+    keyBtn.classList.remove('correct', 'present', 'absent');
+    keyBtn.classList.add(state);
 }
 
 function shakeRow(row) {
-    grid[row].forEach(t => {
-        t.style.animation = 'shake .3s';          // quick shake effect
-        t.addEventListener('animationend', () => t.style.animation = '', { once: true });
+    grid[row].forEach((tile, i) => {
+        setTimeout(() => {
+            tile.style.animation = 'shake 0.5s ease-in-out';
+            tile.addEventListener('animationend', () => {
+                tile.style.animation = '';
+            }, { once: true });
+        }, i * 50);
     });
 }

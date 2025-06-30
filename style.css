@@ -5,9 +5,11 @@
   --gray: #787c7e;
   --light-gray: #d3d6da;
   --border: #3a3a3c;
-  --tile-size: 58px; /* tweak for mobile: clamp(12vmin,58px,64px) */
+  --tile-size: clamp(50px, 12vmin, 62px);
   --gap: 5px;
-  font-family: system-ui, sans-serif;
+  --keyboard-key-height: 58px;
+  --keyboard-key-height-small: 48px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
   text-align: center;
   background: #121213;
   color: #fff;
@@ -20,11 +22,23 @@
   padding: 0;
 }
 
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 10px;
+}
+
 /* Header */
 h1 {
-  margin: 20px 0;
-  font-size: 2rem;
-  letter-spacing: 0.1em;
+  margin: 20px 0 30px 0;
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border);
+  width: 100%;
+  padding-bottom: 20px;
 }
 
 /* ---------- BOARD ---------- */
@@ -34,8 +48,9 @@ h1 {
   grid-auto-rows: var(--tile-size);
   gap: var(--gap);
   justify-content: center;
-  margin: 0 auto 20px;
+  margin: 0 auto 40px;
   width: max-content;
+  padding: 10px;
 }
 
 .tile {
@@ -46,72 +61,196 @@ h1 {
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 4vmin, 2rem);
   text-transform: uppercase;
+  position: relative;
+  transition: border-color 0.1s ease;
+  user-select: none;
 }
 
 /* Tile states */
 .filled {
   border-color: var(--light-gray);
+  animation: tile-pop 0.1s ease-in-out;
 }
+
 .correct {
   background: var(--green);
-  border: none;
+  border-color: var(--green);
   color: #fff;
 }
+
 .present {
   background: var(--yellow);
-  border: none;
+  border-color: var(--yellow);
   color: #fff;
 }
+
 .absent {
   background: var(--gray);
-  border: none;
+  border-color: var(--gray);
   color: #fff;
+}
+
+/* Flip animation for tiles */
+.tile.flip {
+  animation: flip 0.6s ease-in-out forwards;
+}
+
+@keyframes flip {
+  0% {
+    transform: rotateX(0);
+  }
+  50% {
+    transform: rotateX(-90deg);
+  }
+  100% {
+    transform: rotateX(0);
+  }
+}
+
+@keyframes tile-pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-2px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(2px);
+  }
 }
 
 /* ---------- KEYBOARD ---------- */
 #keyboard {
-  display: grid;
-  grid-template-columns: repeat(10, minmax(28px, 1fr));
-  gap: var(--gap);
-  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 500px;
   margin: 0 auto;
+  padding: 0 8px;
+}
+
+.keyboard-row {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
 }
 
 .key {
-  padding: 12px 0;
+  min-width: 43px;
+  height: var(--keyboard-key-height);
   background: var(--light-gray);
   border: none;
   border-radius: 4px;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
   user-select: none;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  transition: background-color 0.1s ease;
+}
+
+.key:hover {
+  opacity: 0.9;
+}
+
+.key:active {
+  transform: scale(0.95);
 }
 
 .key.wide {
-  grid-column: span 2;
-} /* "Enter" & "Backspace" */
+  min-width: 65px;
+  font-size: 0.75rem;
+  padding: 0 8px;
+}
+
 .key.correct {
   background: var(--green);
   color: #fff;
 }
+
 .key.present {
   background: var(--yellow);
   color: #fff;
 }
+
 .key.absent {
   background: var(--gray);
   color: #fff;
 }
 
-/* Small screens */
+/* Mobile optimizations */
 @media (max-width: 480px) {
   :root {
-    --tile-size: 46px;
+    --keyboard-key-height: var(--keyboard-key-height-small);
   }
+
+  body {
+    padding: 0 8px;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+    margin: 15px 0 20px 0;
+    padding-bottom: 15px;
+  }
+
+  #board {
+    margin: 0 auto 30px;
+    gap: 4px;
+  }
+
   .key {
-    padding: 8px 0;
-    font-size: 0.8rem;
+    min-width: 32px;
+    font-size: 0.75rem;
+  }
+
+  .key.wide {
+    min-width: 55px;
+    font-size: 0.65rem;
+  }
+
+  #keyboard {
+    gap: 6px;
+  }
+
+  .keyboard-row {
+    gap: 4px;
+  }
+}
+
+@media (max-width: 360px) {
+  .key {
+    min-width: 28px;
+    font-size: 0.7rem;
+  }
+
+  .key.wide {
+    min-width: 48px;
   }
 }

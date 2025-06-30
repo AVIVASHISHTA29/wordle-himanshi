@@ -2,10 +2,71 @@
 const WORD_LENGTH = 5;
 const MAX_GUESSES = 6;
 
-/* A tiny demo list; replace with a bigger dictionary or fetch daily word */
-const WORDS = ['apple', 'grape', 'crane', 'plant', 'brine', 'smile', 'chair', 'about', 'other', 'which', 'their', 'would', 'there', 'could', 'water'];
+/* Romantic words for each day from July 4-11, 2025 */
+const ROMANTIC_WORDS = [
+    {
+        word: 'HEART',
+        meaning: 'The center of all my love for you 💕',
+        day: '2025-07-04'
+    },
+    {
+        word: 'SMILE',
+        meaning: 'What you bring to my face every single day ✨',
+        day: '2025-07-05'
+    },
+    {
+        word: 'DREAM',
+        meaning: 'You are my sweetest dream come true 🌙',
+        day: '2025-07-06'
+    },
+    {
+        word: 'ANGEL',
+        meaning: 'Because that\'s exactly what you are to me 👼',
+        day: '2025-07-07'
+    },
+    {
+        word: 'BLISS',
+        meaning: 'The feeling I get whenever I\'m with you 🥰',
+        day: '2025-07-08'
+    },
+    {
+        word: 'MAGIC',
+        meaning: 'What happens every time you look at me ✨',
+        day: '2025-07-09'
+    },
+    {
+        word: 'SWEET',
+        meaning: 'Just like you, my beautiful girlfriend 🍯',
+        day: '2025-07-10'
+    }
+];
 
-const ANSWER = WORDS[Math.floor(Math.random() * WORDS.length)].toUpperCase();
+// Function to get today's word based on date
+function getTodaysWord() {
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+
+    // Check if today is within our special date range (July 4-11, 2025)
+    const todaysEntry = ROMANTIC_WORDS.find(entry => entry.day === today);
+
+    if (todaysEntry) {
+        return todaysEntry;
+    }
+
+    // For testing/demo purposes: cycle through words based on current day
+    // This ensures we always have a romantic word to play with
+    const currentDate = new Date();
+    const dayOfYear = Math.floor((currentDate - new Date(currentDate.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+    const wordIndex = dayOfYear % ROMANTIC_WORDS.length;
+
+    return {
+        word: ROMANTIC_WORDS[wordIndex].word,
+        meaning: ROMANTIC_WORDS[wordIndex].meaning,
+        day: today // Use today's date for display
+    };
+}
+
+const TODAY_ENTRY = getTodaysWord();
+const ANSWER = TODAY_ENTRY.word;
 
 let currentRow = 0;
 let currentCol = 0;
@@ -154,11 +215,11 @@ function submitGuess() {
     setTimeout(() => {
         if (guess === ANSWER) {
             setTimeout(() => {
-                alert('🎉 Congratulations! You guessed the word!');
+                showModal(true, guess);
             }, 500);
         } else if (++currentRow === MAX_GUESSES) {
             setTimeout(() => {
-                alert(`Game Over! The word was: ${ANSWER}`);
+                showModal(false, guess);
             }, 500);
         } else {
             gameOver = false; // Re-enable input for next guess
@@ -207,5 +268,118 @@ function shakeRow(row) {
                 tile.style.animation = '';
             }, { once: true });
         }, i * 50);
+    });
+}
+
+/* ---------- Sweet Modal System ---------- */
+function showModal(isWin, guess) {
+    const modal = createModal(isWin, guess);
+    document.body.appendChild(modal);
+
+    // Trigger entrance animation
+    setTimeout(() => {
+        modal.classList.add('show');
+    }, 50);
+}
+
+function createModal(isWin, guess) {
+    const modal = document.createElement('div');
+    modal.className = 'game-modal';
+
+    const content = document.createElement('div');
+    content.className = 'modal-content';
+
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'modal-close';
+    closeBtn.innerHTML = '×';
+    closeBtn.onclick = () => closeModal(modal);
+
+    const title = document.createElement('h2');
+    const message = document.createElement('p');
+    const wordReveal = document.createElement('div');
+    const meaning = document.createElement('div');
+    const playAgainBtn = document.createElement('button');
+
+    if (isWin) {
+        title.innerHTML = '🎉 You Got It! 🎉';
+        title.className = 'modal-title win';
+
+        const attempts = currentRow + 1;
+        const encouragements = [
+            'Amazing! You\'re brilliant! 💕',
+            'Incredible! You\'re so smart! ✨',
+            'Perfect! You\'re amazing! 🥰',
+            'Wonderful! You\'re the best! 💖',
+            'Fantastic! You\'re incredible! 🌟',
+            'Outstanding! You\'re perfect! 💕'
+        ];
+
+        message.innerHTML = `${encouragements[Math.min(attempts - 1, encouragements.length - 1)]}<br>You solved it in ${attempts} ${attempts === 1 ? 'try' : 'tries'}!`;
+        message.className = 'modal-message win';
+    } else {
+        title.innerHTML = '💕 So Close, Sweetheart! 💕';
+        title.className = 'modal-title lose';
+
+        message.innerHTML = 'Don\'t worry, beautiful! Every puzzle is just another reason for us to spend time together! 🥰';
+        message.className = 'modal-message lose';
+    }
+
+    wordReveal.innerHTML = `<strong>Today's word was:</strong> <span class="word-display">${ANSWER}</span>`;
+    wordReveal.className = 'word-reveal';
+
+    meaning.innerHTML = `<div class="meaning-label">💕 What it means:</div><div class="meaning-text">${TODAY_ENTRY.meaning}</div>`;
+    meaning.className = 'word-meaning';
+
+    playAgainBtn.textContent = '💕 Play Tomorrow\'s Word';
+    playAgainBtn.className = 'play-again-btn';
+    playAgainBtn.onclick = () => {
+        closeModal(modal);
+        resetGame();
+    };
+
+    content.appendChild(closeBtn);
+    content.appendChild(title);
+    content.appendChild(message);
+    content.appendChild(wordReveal);
+    content.appendChild(meaning);
+    content.appendChild(playAgainBtn);
+
+    modal.appendChild(content);
+
+    // Close on background click
+    modal.onclick = (e) => {
+        if (e.target === modal) closeModal(modal);
+    };
+
+    return modal;
+}
+
+function closeModal(modal) {
+    modal.classList.remove('show');
+    setTimeout(() => {
+        if (modal.parentNode) {
+            modal.parentNode.removeChild(modal);
+        }
+    }, 300);
+}
+
+function resetGame() {
+    // Reset game state
+    currentRow = 0;
+    currentCol = 0;
+    gameOver = false;
+
+    // Clear all tiles
+    grid.forEach(row => {
+        row.forEach(tile => {
+            tile.textContent = '';
+            tile.className = 'tile';
+            tile.style.animation = '';
+        });
+    });
+
+    // Reset keyboard
+    document.querySelectorAll('.key').forEach(key => {
+        key.classList.remove('correct', 'present', 'absent');
     });
 }

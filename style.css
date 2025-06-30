@@ -9,6 +9,17 @@
   --gap: 5px;
   --keyboard-key-height: 58px;
   --keyboard-key-height-small: 48px;
+
+  /* Romantic theme colors */
+  --pink-soft: #ffeef5;
+  --pink-light: #ffb3d1;
+  --pink-medium: #ff6bb3;
+  --pink-dark: #e91e63;
+  --purple-soft: #f3e5f5;
+  --purple-light: #ce93d8;
+  --gradient-romantic: linear-gradient(135deg, #ff6bb3, #9c27b0, #673ab7);
+  --shadow-soft: 0 10px 30px rgba(255, 107, 179, 0.3);
+
   font-family: "Helvetica Neue", Arial, sans-serif;
   text-align: center;
   background: #121213;
@@ -282,5 +293,228 @@ h1 {
 
   .key.wide {
     min-width: 48px;
+  }
+}
+
+/* ---------- ROMANTIC MODAL STYLES ---------- */
+.game-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: all 0.3s ease-out;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.game-modal.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.modal-content {
+  background: linear-gradient(145deg, #ffffff, #fdf2f8);
+  border-radius: 20px;
+  padding: 30px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  box-shadow: var(--shadow-soft);
+  border: 2px solid var(--pink-light);
+  animation: modalFloat 0.6s ease-out;
+}
+
+@keyframes modalFloat {
+  0% {
+    transform: translateY(-50px) scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: var(--pink-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover {
+  background: var(--pink-soft);
+  transform: scale(1.1);
+}
+
+.modal-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  background: var(--gradient-romantic);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.modal-title.win {
+  animation: celebrate 0.8s ease-out;
+}
+
+.modal-title.lose {
+  color: var(--pink-dark);
+}
+
+@keyframes celebrate {
+  0%,
+  50%,
+  100% {
+    transform: scale(1);
+  }
+  25%,
+  75% {
+    transform: scale(1.1);
+  }
+}
+
+.modal-message {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  line-height: 1.4;
+  color: #4a4a4a;
+}
+
+.modal-message.win {
+  color: var(--pink-dark);
+  font-weight: 500;
+}
+
+.modal-message.lose {
+  color: #666;
+}
+
+.word-reveal {
+  background: var(--gradient-romantic);
+  color: white;
+  padding: 15px 20px;
+  border-radius: 15px;
+  margin: 20px 0;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 15px rgba(255, 107, 179, 0.3);
+}
+
+.word-display {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  display: block;
+  margin-top: 8px;
+}
+
+.word-meaning {
+  background: var(--pink-soft);
+  border: 2px solid var(--pink-light);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 20px 0;
+  text-align: left;
+}
+
+.meaning-label {
+  font-weight: 700;
+  color: var(--pink-dark);
+  margin-bottom: 10px;
+  font-size: 1rem;
+}
+
+.meaning-text {
+  color: #4a4a4a;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+.play-again-btn {
+  background: var(--gradient-romantic);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 25px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 179, 0.4);
+  margin-top: 10px;
+}
+
+.play-again-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 179, 0.5);
+}
+
+.play-again-btn:active {
+  transform: translateY(0);
+}
+
+/* Mobile modal adjustments */
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 25px 20px;
+    margin: 10px;
+    border-radius: 15px;
+  }
+
+  .modal-title {
+    font-size: 1.5rem;
+  }
+
+  .modal-message {
+    font-size: 1rem;
+  }
+
+  .word-display {
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+  }
+
+  .meaning-text {
+    font-size: 1rem;
+  }
+
+  .play-again-btn {
+    padding: 12px 25px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .game-modal {
+    padding: 15px;
+  }
+
+  .modal-content {
+    padding: 20px 15px;
   }
 }

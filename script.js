@@ -1,21 +1,21 @@
 /* ---------- Config ---------- */
-const WORD_LENGTH = 5;
+let WORD_LENGTH = 5; // This will be set dynamically based on the word
 const MAX_GUESSES = 6;
 
-/* Romantic words for each day from July 4-11, 2025 */
+/* Romantic words for each day from July 4-11, 2025 - now with varying lengths! */
 const ROMANTIC_WORDS = [
     {
-        word: 'HEART',
+        word: 'POOKIE',
         meaning: 'The center of all my love for you 💕',
         day: '2025-07-04'
     },
     {
-        word: 'SMILE',
+        word: 'SMILES',
         meaning: 'What you bring to my face every single day ✨',
         day: '2025-07-05'
     },
     {
-        word: 'DREAM',
+        word: 'DREAMS',
         meaning: 'You are my sweetest dream come true 🌙',
         day: '2025-07-06'
     },
@@ -25,8 +25,8 @@ const ROMANTIC_WORDS = [
         day: '2025-07-07'
     },
     {
-        word: 'BLISS',
-        meaning: 'The feeling I get whenever I\'m with you 🥰',
+        word: 'BEAUTIFUL',
+        meaning: 'The perfect word to describe you, my love 🥰',
         day: '2025-07-08'
     },
     {
@@ -35,8 +35,8 @@ const ROMANTIC_WORDS = [
         day: '2025-07-09'
     },
     {
-        word: 'SWEET',
-        meaning: 'Just like you, my beautiful girlfriend 🍯',
+        word: 'SWEETHEART',
+        meaning: 'My favorite name for you, my darling 🍯',
         day: '2025-07-10'
     }
 ];
@@ -67,6 +67,7 @@ function getTodaysWord() {
 
 const TODAY_ENTRY = getTodaysWord();
 const ANSWER = TODAY_ENTRY.word;
+WORD_LENGTH = ANSWER.length; // Set word length dynamically
 
 let currentRow = 0;
 let currentCol = 0;
@@ -77,18 +78,30 @@ let gameOver = false;
 const board = document.getElementById('board');
 const keyboard = document.getElementById('keyboard');
 
-/* ---------- Build empty board ---------- */
-for (let r = 0; r < MAX_GUESSES; r++) {
-    grid[r] = [];
-    for (let c = 0; c < WORD_LENGTH; c++) {
-        const tile = document.createElement('div');
-        tile.className = 'tile';
-        tile.setAttribute('data-row', r);
-        tile.setAttribute('data-col', c);
-        board.appendChild(tile);
-        grid[r][c] = tile;
+/* ---------- Build empty board dynamically ---------- */
+function createBoard() {
+    // Clear existing board
+    board.innerHTML = '';
+    grid = [];
+
+    // Update CSS grid columns dynamically
+    board.style.gridTemplateColumns = `repeat(${WORD_LENGTH}, var(--tile-size))`;
+
+    for (let r = 0; r < MAX_GUESSES; r++) {
+        grid[r] = [];
+        for (let c = 0; c < WORD_LENGTH; c++) {
+            const tile = document.createElement('div');
+            tile.className = 'tile';
+            tile.setAttribute('data-row', r);
+            tile.setAttribute('data-col', c);
+            board.appendChild(tile);
+            grid[r][c] = tile;
+        }
     }
 }
+
+// Create the initial board
+createBoard();
 
 /* ---------- Build keyboard ---------- */
 const KEYBOARD_LAYOUT = [
@@ -327,10 +340,10 @@ function createModal(isWin, guess) {
     wordReveal.innerHTML = `<strong>Today's word was:</strong> <span class="word-display">${ANSWER}</span>`;
     wordReveal.className = 'word-reveal';
 
-    meaning.innerHTML = `<div class="meaning-label">💕 What it means:</div><div class="meaning-text">${TODAY_ENTRY.meaning}</div>`;
+    meaning.innerHTML = `<div class="meaning-label">💕 What it means:</div><div class="meaning-text">${(window.TODAY_ENTRY || TODAY_ENTRY).meaning}</div>`;
     meaning.className = 'word-meaning';
 
-    playAgainBtn.textContent = '💕 Play Tomorrow\'s Word';
+    playAgainBtn.textContent = '💕 Play Next Word';
     playAgainBtn.className = 'play-again-btn';
     playAgainBtn.onclick = () => {
         closeModal(modal);
@@ -364,19 +377,22 @@ function closeModal(modal) {
 }
 
 function resetGame() {
+    // Get a new word (for demo purposes, cycle to next word)
+    const currentIndex = ROMANTIC_WORDS.findIndex(entry => entry.word === ANSWER);
+    const nextIndex = (currentIndex + 1) % ROMANTIC_WORDS.length;
+    const newEntry = ROMANTIC_WORDS[nextIndex];
+
+    // Update global variables with new word
+    Object.assign(window, { TODAY_ENTRY: newEntry, ANSWER: newEntry.word });
+    WORD_LENGTH = newEntry.word.length;
+
     // Reset game state
     currentRow = 0;
     currentCol = 0;
     gameOver = false;
 
-    // Clear all tiles
-    grid.forEach(row => {
-        row.forEach(tile => {
-            tile.textContent = '';
-            tile.className = 'tile';
-            tile.style.animation = '';
-        });
-    });
+    // Recreate board with new word length
+    createBoard();
 
     // Reset keyboard
     document.querySelectorAll('.key').forEach(key => {

@@ -6,7 +6,7 @@ const MAX_GUESSES = 6;
 const ROMANTIC_WORDS = [
     {
         word: 'POOKIE',
-        meaning: 'The center of all my love for you 💕',
+        meaning: 'Hi My pookie, my love, my baby, I love you so much. Happy birthday week my POOKIE',
         day: '2025-07-04'
     },
     {
@@ -41,27 +41,37 @@ const ROMANTIC_WORDS = [
     }
 ];
 
-// Function to get today's word based on date
+// Function to get today's word based on date (IST timezone)
 function getTodaysWord() {
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    // Get current time in IST (UTC+5:30)
+    const now = new Date();
+    const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30 in milliseconds
+    const istTime = new Date(now.getTime() + istOffset);
+    const today = istTime.toISOString().split('T')[0]; // YYYY-MM-DD format in IST
+
+    console.log('Current UTC time:', now.toISOString());
+    console.log('Current IST time:', istTime.toISOString());
+    console.log('Today in IST:', today);
 
     // Check if today is within our special date range (July 4-11, 2025)
     const todaysEntry = ROMANTIC_WORDS.find(entry => entry.day === today);
 
     if (todaysEntry) {
+        console.log('Found scheduled word for today:', todaysEntry.word);
         return todaysEntry;
     }
 
     // For testing/demo purposes: cycle through words based on current day
     // This ensures we always have a romantic word to play with
-    const currentDate = new Date();
-    const dayOfYear = Math.floor((currentDate - new Date(currentDate.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+    const dayOfYear = Math.floor((istTime - new Date(istTime.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
     const wordIndex = dayOfYear % ROMANTIC_WORDS.length;
+
+    console.log('Using cycled word:', ROMANTIC_WORDS[wordIndex].word);
 
     return {
         word: ROMANTIC_WORDS[wordIndex].word,
         meaning: ROMANTIC_WORDS[wordIndex].meaning,
-        day: today // Use today's date for display
+        day: today // Use today's date in IST for display
     };
 }
 

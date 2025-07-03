@@ -5,8 +5,8 @@
   --gray: #787c7e;
   --light-gray: #d3d6da;
   --border: #3a3a3c;
-  --tile-size: clamp(40px, 10vmin, 62px);
-  --gap: clamp(2px, 0.8vmin, 5px);
+  --tile-size: clamp(50px, 12vmin, 80px);
+  --gap: clamp(3px, 1vmin, 8px);
   --keyboard-key-height: clamp(45px, 8vmin, 58px);
   --keyboard-key-height-small: clamp(40px, 7vmin, 48px);
 
@@ -63,6 +63,19 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+/* Main content container */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100dvh;
+  padding-bottom: clamp(200px, 25vh, 280px); /* Space for keyboard */
+  box-sizing: border-box;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
 /* Header */
 h1 {
   margin: clamp(10px, 3vh, 20px) 0 clamp(15px, 3vh, 30px) 0;
@@ -82,12 +95,13 @@ h1 {
   grid-auto-rows: var(--tile-size);
   gap: var(--gap);
   justify-content: center;
-  margin: 0 auto clamp(15px, 3vh, 40px);
-  width: max-content;
-  max-width: calc(
-    100vw - 20px
-  ); /* Ensure board doesn't overflow on small screens */
-  padding: 0 10px;
+  margin: 0 auto clamp(20px, 4vh, 40px);
+  width: 100%;
+  max-width: min(
+    95vw,
+    calc(var(--tile-size) * 12 + var(--gap) * 11)
+  ); /* Allow wider boards for longer words */
+  padding: 0 clamp(5px, 2vw, 15px);
   flex-shrink: 0;
   overflow-x: auto; /* Allow horizontal scroll for very long words on small screens */
 }
@@ -203,10 +217,17 @@ h1 {
   gap: clamp(4px, 1vh, 8px);
   max-width: 100%;
   margin: 0 auto;
-  padding: 0 clamp(8px, 2vw, 16px);
-  flex: 1;
-  justify-content: flex-start;
+  padding: clamp(8px, 2vw, 16px) clamp(8px, 2vw, 16px) clamp(12px, 3vh, 20px);
+  flex-shrink: 0;
+  justify-content: flex-end;
   overflow: hidden;
+  width: 100%;
+  /* Position at bottom of screen using dvh */
+  position: fixed;
+  bottom: 32px;
+  left: 0;
+  background: linear-gradient(0deg, #121213 85%, transparent 100%);
+  z-index: 10;
 }
 
 .keyboard-row {
@@ -476,16 +497,16 @@ h1 {
 @media (max-width: 480px) {
   :root {
     --keyboard-key-height: var(--keyboard-key-height-small);
-    --tile-size: clamp(
-      35px,
-      8vmin,
-      50px
-    ); /* Smaller tiles for longer words on mobile */
-    --gap: clamp(1px, 0.5vmin, 3px);
+    --tile-size: clamp(40px, 10vmin, 65px); /* Larger tiles for mobile too */
+    --gap: clamp(2px, 0.8vmin, 5px);
   }
 
-  body {
-    padding: 0;
+  .main-content {
+    padding-bottom: clamp(
+      180px,
+      22vh,
+      250px
+    ); /* Smaller keyboard space on mobile */
   }
 
   h1 {
@@ -496,13 +517,14 @@ h1 {
 
   #board {
     margin: 0 auto clamp(12px, 2vh, 30px);
-    gap: clamp(1px, 0.5vmin, 3px);
-    padding: 0 5px; /* Reduce padding for longer words */
+    gap: clamp(2px, 0.8vmin, 5px);
+    padding: 0 clamp(3px, 1vw, 8px); /* Reduce padding for longer words */
+    max-width: min(98vw, calc(var(--tile-size) * 12 + var(--gap) * 11));
   }
 
   #keyboard {
     gap: clamp(3px, 1vh, 6px);
-    padding: 0 clamp(6px, 2vw, 8px);
+    padding: clamp(6px, 2vw, 8px) clamp(6px, 2vw, 8px) clamp(10px, 2vh, 16px);
   }
 
   .keyboard-row {
@@ -519,8 +541,12 @@ h1 {
 /* Extra small screens - further tile size reduction for very long words */
 @media (max-width: 360px) {
   :root {
-    --tile-size: clamp(30px, 7vmin, 45px);
-    --gap: clamp(1px, 0.3vmin, 2px);
+    --tile-size: clamp(35px, 9vmin, 55px);
+    --gap: clamp(1px, 0.5vmin, 3px);
+  }
+
+  .main-content {
+    padding-bottom: clamp(160px, 20vh, 220px); /* Even smaller keyboard space */
   }
 
   .game-modal {
@@ -534,12 +560,25 @@ h1 {
   }
 
   #board {
-    padding: 0 2px;
+    padding: 0 clamp(2px, 0.5vw, 5px);
+    max-width: 99vw;
+  }
+
+  #keyboard {
+    padding: 5px 5px clamp(8px, 2vh, 12px);
   }
 }
 
 /* Landscape mobile optimization */
 @media (max-height: 600px) and (orientation: landscape) {
+  .main-content {
+    padding-bottom: clamp(
+      140px,
+      18vh,
+      200px
+    ); /* Reduced keyboard space in landscape */
+  }
+
   h1 {
     margin: 5px 0 10px 0;
     padding-bottom: 8px;
@@ -552,6 +591,7 @@ h1 {
 
   #keyboard {
     gap: 3px;
+    padding: 5px 8px 8px;
   }
 
   .modal-content {

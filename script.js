@@ -5,8 +5,8 @@ const MAX_GUESSES = 6;
 /* Romantic words for each day from July 4-11, 2025 - now with varying lengths! */
 const ROMANTIC_WORDS = [
     {
-        word: 'POOKIE',
-        meaning: 'Hi My pookie, my love, my baby, I love you so much. Happy birthday week my POOKIE',
+        word: 'SUSHI',
+        meaning: 'Thankyou for introducing me to sushi, yum yum cha and all things nice and delicious, including you 🥰',
         day: '2025-07-04'
     },
     {

@@ -10,7 +10,7 @@ const ROMANTIC_WORDS = [
         day: '2025-07-04'
     },
     {
-        word: 'Pyaaru',
+        word: 'PYAARU',
         meaning: 'you were, are and forever will be my Pyaaru. Thankyou for being the cutest human alive ✨',
         day: '2025-07-05'
     },

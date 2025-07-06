@@ -15,8 +15,8 @@ const ROMANTIC_WORDS = [
         day: '2025-07-05'
     },
     {
-        word: 'DREAMS',
-        meaning: 'You are my sweetest dream come true 🌙',
+        word: 'SORRY',
+        meaning: `Hi, I am sorry for being impatient and annoyed all the time. I really love you and I'll be a better man I promise. Thankyou for loving me and being patient with me when I go through such phases. I am grateful to have you in my life, and grateful that I get to take you out for shopping 🥺 I love you my baby, my princess.`,
         day: '2025-07-06'
     },
     {

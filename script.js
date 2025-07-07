@@ -20,8 +20,8 @@ const ROMANTIC_WORDS = [
         day: '2025-07-06'
     },
     {
-        word: 'ANGEL',
-        meaning: 'Because that\'s exactly what you are to me 👼',
+        word: 'PROUD',
+        meaning: `Hi my hardworking, pyaara studious sweetheart. I know you don't believe me but trust me you make so proud every day, thankyou for being someone I can always look upto and admire. I really adore you, and you inspire me to be a better person each day. I love you 😘`,
         day: '2025-07-07'
     },
     {

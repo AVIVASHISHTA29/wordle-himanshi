@@ -27,12 +27,12 @@ const ROMANTIC_WORDS = [
     {
         word: 'KUCHUPUCHU',
         meaning: 'The perfect word to describe you, my baby, my kuchupuchu cutu kitten 🥰',
-        day: '2025-07-08'
+        day: '2025-07-09'
     },
     {
         word: 'MAGIC',
         meaning: 'What happens every time you look at me ✨',
-        day: '2025-07-09'
+        day: '2025-07-11'
     },
     {
         word: 'SWEETHEART',

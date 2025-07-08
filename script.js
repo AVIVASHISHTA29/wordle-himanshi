@@ -25,8 +25,8 @@ const ROMANTIC_WORDS = [
         day: '2025-07-07'
     },
     {
-        word: 'BEAUTIFUL',
-        meaning: 'The perfect word to describe you, my love 🥰',
+        word: 'KUCHUPUCHU',
+        meaning: 'The perfect word to describe you, my baby, my kuchupuchu cutu kitten 🥰',
         day: '2025-07-08'
     },
     {
